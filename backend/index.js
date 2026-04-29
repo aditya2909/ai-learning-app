@@ -33,7 +33,10 @@ await initDB();
 
 app.use(
   cors({
-    origin: "https://ai-learning-app-dzvc.vercel.app",
+    origin: [
+      "https://ai-learning-app-dzvc.vercel.app",
+      "https://ai-learning-app-beta.vercel.app"
+    ]
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
