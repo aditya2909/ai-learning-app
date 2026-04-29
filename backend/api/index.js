@@ -36,12 +36,14 @@ app.use(
     origin: [
       "https://ai-learning-app-dzvc.vercel.app",
       "https://ai-learning-app-beta.vercel.app",
-    ]
+    ],
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   }),
 );
+
+app.options("*", cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
