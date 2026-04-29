@@ -19,7 +19,17 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-connectDB();
+let isConnected = false;
+
+async function initDB() {
+  if (!isConnected) {
+    await connectDB();
+    isConnected = true;
+    console.log("MongoDB connected");
+  }
+}
+
+await initDB();
 
 app.use(
   cors({
@@ -42,6 +52,8 @@ app.use("/api/aiRoutes", aiRoutes);
 app.use("/api/quizzes", quizRoutes);
 app.use("/api/progress", progressRoutes);
 
+app.get("/", (req, res) => res.send("Server is running"));
+app.get("/favicon.ico", (req, res) => res.status(204).end());
 app.use(errorHandler);
 
 app.use((req, res) => {
@@ -51,9 +63,6 @@ app.use((req, res) => {
     statusCode: 404,
   });
 });
-
-app.get("/", (req, res) => res.send("Server is running"));
-app.get("/favicon.ico", (req, res) => res.status(204).end());
 
 const PORT = process.env.PORT || 8000;
 
