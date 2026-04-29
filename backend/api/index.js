@@ -19,36 +19,49 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-let isConnected = false;
+let dbConnectionPromise;
 
 async function initDB() {
-  if (!isConnected) {
-    await connectDB();
-    isConnected = true;
-    console.log("MongoDB connected");
+  if (!dbConnectionPromise) {
+    dbConnectionPromise = connectDB().catch((error) => {
+      dbConnectionPromise = null;
+      throw error;
+    });
   }
+
+  await dbConnectionPromise;
 }
 
-await initDB();
+const corsOptions = {
+  origin: [
+    "https://ai-learning-app-dzvc.vercel.app",
+    "https://ai-learning-app-beta.vercel.app",
+  ],
+  methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
 
-app.use(
-  cors({
-    origin: [
-      "https://ai-learning-app-dzvc.vercel.app",
-      "https://ai-learning-app-beta.vercel.app",
-    ],
-    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  }),
-);
+app.use(cors(corsOptions));
 
-app.options("*", cors());
+app.options("/{*splat}", cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+app.get("/", (req, res) => res.send("Server is running"));
+app.get("/favicon.ico", (req, res) => res.status(204).end());
+
+app.use(async (req, res, next) => {
+  try {
+    await initDB();
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 app.use("/api/auth", authRoutes);
 app.use("/api/documents", documentRoutes);
@@ -57,8 +70,6 @@ app.use("/api/aiRoutes", aiRoutes);
 app.use("/api/quizzes", quizRoutes);
 app.use("/api/progress", progressRoutes);
 
-app.get("/", (req, res) => res.send("Server is running"));
-app.get("/favicon.ico", (req, res) => res.status(204).end());
 app.use(errorHandler);
 
 app.use((req, res) => {
@@ -69,11 +80,8 @@ app.use((req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 8000;
-
 process.on("unhandledRejection", (error) => {
   console.error("Error: ", error.message);
-  process.exit(1);
 });
 
 export default app;

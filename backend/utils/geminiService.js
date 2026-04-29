@@ -3,14 +3,19 @@ import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let ai;
 
-if (!process.env.GEMINI_API_KEY) {
-  console.error(
-    "FATAL ERROR: GEMINI_API_KEY is not set in environment variables.",
-  );
-  process.exit(1);
-}
+const getAI = () => {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error("GEMINI_API_KEY is not set");
+  }
+
+  if (!ai) {
+    ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  }
+
+  return ai;
+};
 
 export const generateFlashCards = async (text, count = 10) => {
   const prompt = `Generate exactly ${count} educational flashcards from the following text. 
@@ -25,7 +30,7 @@ export const generateFlashCards = async (text, count = 10) => {
     ${text.substring(0, 15000)}`;
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash-lite",
       contents: prompt,
     });
@@ -83,7 +88,7 @@ export const generateQuiz = async (text, numQuestions) => {
     ${text.substring(0, 15000)}`;
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash-lite",
       contents: prompt,
     });
@@ -146,7 +151,7 @@ export const generateSummary = async (text) => {
     ${text.substring(0, 15000)}`;
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash-lite",
       contents: prompt,
     });
@@ -173,7 +178,7 @@ export const chatWithContext = async (question, chunks) => {
     Answer: `;
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash-lite",
       contents: prompt,
     });
@@ -194,7 +199,7 @@ export const explainConcept = async (concept, context) => {
   ${context.substring(0, 10000)} `;
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash-lite",
       contents: prompt,
     });
