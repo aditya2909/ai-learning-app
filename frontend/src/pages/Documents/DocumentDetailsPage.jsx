@@ -42,7 +42,9 @@ const DocumentDetailsPage = () => {
     if (filePath.startsWith("https://") || filePath.startsWith("http://")) {
       return filePath;
     }
-    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const baseUrl =
+      import.meta.env.VITE_API_URL ||
+      "https://ai-learning-app-6l4x.onrender.com";
     return `${baseUrl}${filePath.startsWith("/") ? "" : "/"}${filePath}`;
   };
 
