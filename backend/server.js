@@ -23,17 +23,7 @@ connectDB();
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (
-        !origin ||
-        origin.includes("ai-learning-app-dzvc.vercel.app") ||
-        origin.includes("vercel.app")
-      ) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: "https://ai-learning-app-dzvc.vercel.app",
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
