@@ -1,4 +1,4 @@
-export const BASE_URL = "https://ai-learning-app-beta.vercel.app";
+export const BASE_URL = "https://ai-learning-app-6l4x.onrender.com";
 
 export const API_PATHS = {
   AUTH: {
